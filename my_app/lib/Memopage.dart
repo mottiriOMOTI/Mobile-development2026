@@ -96,15 +96,13 @@ class _MemopageState extends State<Memopage> {
       child: Text("カスタマイズ"),
     ),
 
-    // ★ 追加部分 ★
+
+
     TextButton(
       child: Text("ホームページに遷移する"),
       onPressed: () {
-        Navigator.push(
-          context,
-                MaterialPageRoute(builder: (context) => HomePage()),
-        );
-      },
+              Navigator.popUntil(context, (route) => route.isFirst);
+            },
     ),
   ],
 ),

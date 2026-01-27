@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_app/Taskpage.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'Firstpage.dart';
 import 'Memopage.dart';   // ← 追加
 import 'Taskpage.dart';
 
@@ -40,6 +39,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 20),
 
           // ▼ 既存の "1ページ目に遷移する"
+          /*
           Center(
             child: TextButton(
               child: Text("1ページ目に遷移する"),
@@ -52,25 +52,27 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-          ),
+          ),*/
 
           SizedBox(height: 10),
 
           // ▼ 新しい「Memopage へ移動」
           Center(
-            child: ElevatedButton(
-              child: Text("メモページへ移動する"),
-              onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Memopage()),
-              );
-            },
-            ),
+            child: TextButton(
+          child: Text("メモページ"),
+          onPressed: (){
+            // （1） 指定した画面に遷移する
+            Navigator.push(context, MaterialPageRoute(
+              // （2） 実際に表示するページ(ウィジェット)を指定する
+              builder: (context) => Memopage()
+            ));
+          },
+        ),
           ),
 
           
           // ▼ 新しい「Taskpage へ移動」
+          /*
           Center(
             child: ElevatedButton(
               child: Text("タスクページへ移動する"),
@@ -81,8 +83,7 @@ class _HomePageState extends State<HomePage> {
                 );
               },
             ),
-          ),
-
+          ),*/
         ],
       ),
     );
