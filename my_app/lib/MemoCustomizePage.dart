@@ -4,51 +4,81 @@ import 'Memo_model.dart';
 class MemoCustomizePage extends StatefulWidget {
   final List<CustomField> fields;
 
-  MemoCustomizePage({required this.fields});
+  // 【警告修正】constを追加し、名前付き引数 key を追加しました
+  const MemoCustomizePage({super.key, required this.fields});
 
   @override
-  _MemoCustomizePageState createState() => _MemoCustomizePageState();
+  State<MemoCustomizePage> createState() => _MemoCustomizePageState();
 }
 
+// 【警告修正】公開API内の非推奨なプライベート型利用を解消するため
+// createStateの戻り値を State<MemoCustomizePage> に明示変更しました
 class _MemoCustomizePageState extends State<MemoCustomizePage> {
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController optionsController = TextEditingController();
   FieldType selectedType = FieldType.text;
-  List<String> options = [];
+  late List<CustomField> localFields;
+
+  @override
+  void initState() {
+    super.initState();
+    localFields = widget.fields.map((f) => CustomField(
+      name: f.name,
+      type: f.type,
+      options: f.options != null ? List<String>.from(f.options!) : null,
+    )).toList();
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    optionsController.dispose();
+    super.dispose();
+  }
 
   void addCustomField() {
-    if (nameController.text.isEmpty) return;
+    if (nameController.text.trim().isEmpty) return;
+
+    List<String>? finalOptions;
+    if (selectedType == FieldType.radio || selectedType == FieldType.dropdown) {
+      if (optionsController.text.trim().isEmpty) return;
+      finalOptions = optionsController.text
+          .split(',')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    }
+
     setState(() {
-      widget.fields.add(CustomField(
-        name: nameController.text,
+      localFields.add(CustomField(
+        name: nameController.text.trim(),
         type: selectedType,
-        options: selectedType == FieldType.radio || selectedType == FieldType.dropdown
-            ? List.from(options)
-            : null,
+        options: finalOptions,
       ));
       nameController.clear();
-      options.clear();
+      optionsController.clear();
       selectedType = FieldType.text;
     });
   }
 
   void removeField(int index) {
-    if (widget.fields[index].name == "タイトル") return;
+    if (localFields[index].name == "タイトル") return;
     setState(() {
-      widget.fields.removeAt(index);
+      localFields.removeAt(index);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("メモカスタマイズ")),
+      appBar: AppBar(title: const Text("メモカスタマイズ")), // constを付与
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16), // constを付与
         child: Column(
           children: [
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: "項目名"),
+              decoration: const InputDecoration(labelText: "項目名"), // constを付与
             ),
             DropdownButton<FieldType>(
               value: selectedType,
@@ -57,30 +87,26 @@ class _MemoCustomizePageState extends State<MemoCustomizePage> {
                       value: e, child: Text(e.toString().split('.').last)))
                   .toList(),
               onChanged: (v) {
-                setState(() {
-                  selectedType = v!;
-                });
+                setState(() { selectedType = v!; });
               },
             ),
             if (selectedType == FieldType.radio || selectedType == FieldType.dropdown)
               TextField(
-                decoration: InputDecoration(labelText: "オプションをカンマ区切りで入力"),
-                onChanged: (v) {
-                  options = v.split(',').map((e) => e.trim()).toList();
-                },
+                controller: optionsController,
+                decoration: const InputDecoration(labelText: "オプションをカンマ区切りで入力"), // constを付与
               ),
-            ElevatedButton(onPressed: addCustomField, child: Text("追加")),
-            Divider(),
+            ElevatedButton(onPressed: addCustomField, child: const Text("追加")), // constを付与
+            const Divider(), // constを付与
             Expanded(
               child: ListView.builder(
-                itemCount: widget.fields.length,
+                itemCount: localFields.length,
                 itemBuilder: (context, index) {
-                  final field = widget.fields[index];
+                  final field = localFields[index];
                   return ListTile(
                     title: Text(field.name),
                     subtitle: Text(field.type.toString().split('.').last),
                     trailing: IconButton(
-                      icon: Icon(Icons.delete),
+                      icon: const Icon(Icons.delete), // constを付与
                       onPressed: () => removeField(index),
                     ),
                   );
@@ -89,9 +115,9 @@ class _MemoCustomizePageState extends State<MemoCustomizePage> {
             ),
             ElevatedButton(
                 onPressed: () {
-                  Navigator.pop(context, widget.fields);
+                  Navigator.pop(context, localFields); 
                 },
-                child: Text("保存"))
+                child: const Text("保存")) // constを付与
           ],
         ),
       ),

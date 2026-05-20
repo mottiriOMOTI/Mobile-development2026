@@ -41,6 +41,7 @@ class Memo {
 
 enum FieldType { text, number, radio, dropdown }
 
+// Memo_model.dart 内の CustomField クラスに以下を追加
 class CustomField {
   String name;
   FieldType type;
@@ -51,4 +52,24 @@ class CustomField {
     required this.type,
     this.options,
   });
+
+  // 【これが無いと保存・読み込みに失敗します】
+  factory CustomField.fromJson(Map<String, dynamic> json) {
+    return CustomField(
+      name: json['name'],
+      type: FieldType.values.firstWhere((e) => e.toString().split('.').last == json['type']),
+      options: json['options'] != null ? List<String>.from(json['options']) : null,
+    );
+  }
+
+  // 【これが無いと保存・読み込みに失敗します】
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'type': type.toString().split('.').last,
+      'options': options,
+    };
+  }
 }
+
+
