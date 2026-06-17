@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/Taskpage.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'Memopage.dart';   // ← 追加
 import 'Taskpage.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {

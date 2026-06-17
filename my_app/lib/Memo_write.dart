@@ -25,6 +25,7 @@ class _MemoWritePageState extends State<MemoWritePage> {
   final List<Map<String, dynamic>> schedules = [];
   final TextEditingController scheduleTitleController = TextEditingController();
   DateTime? selectedScheduleDate;
+  TimeOfDay? selectedScheduleTime;
 
   final List<String> statuses = [
     "未対応", "面談", "１次～選考", "選考インターン", "最終選考", "内定", "終了"
@@ -61,16 +62,41 @@ class _MemoWritePageState extends State<MemoWritePage> {
     }
   }
 
+  // 時刻選択ダイアログを表示する関数
+  Future<void> _pickScheduleTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedScheduleTime = picked;
+      });
+    }
+  }
+
   // スケジュールをリストに追加する関数
   void _addSchedule() {
-    if (scheduleTitleController.text.isEmpty || selectedScheduleDate == null) return;
+    if (scheduleTitleController.text.isEmpty || 
+        selectedScheduleDate == null || 
+        selectedScheduleTime == null) return;
+
+    final combinedDateTime = DateTime(
+      selectedScheduleDate!.year,
+      selectedScheduleDate!.month,
+      selectedScheduleDate!.day,
+      selectedScheduleTime!.hour,
+      selectedScheduleTime!.minute,
+    );
+
     setState(() {
       schedules.add({
         'title': scheduleTitleController.text,
-        'date': selectedScheduleDate!.toIso8601String(),
+        'date': combinedDateTime.toIso8601String(),
       });
       scheduleTitleController.clear();
       selectedScheduleDate = null;
+      selectedScheduleTime = null;
     });
   }
 
@@ -166,7 +192,7 @@ class _MemoWritePageState extends State<MemoWritePage> {
             ...widget.customFields.map((f) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: _buildCustomFieldInput(f),
-            )).toList(),
+            )),
             Divider(),
             Text("スケジュール追加", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             TextField(
@@ -175,21 +201,34 @@ class _MemoWritePageState extends State<MemoWritePage> {
             ),
             Row(
               children: [
-                Text(selectedScheduleDate == null 
-                    ? "日付未選択" 
-                    : "選択日: ${selectedScheduleDate!.toLocal().toString().split(' ')[0]}"),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(selectedScheduleDate == null 
+                          ? "日付未選択" 
+                          : "日: ${selectedScheduleDate!.toLocal().toString().split(' ')[0]}"),
+                      Text(selectedScheduleTime == null 
+                          ? "時刻未選択" 
+                          : "時: ${selectedScheduleTime!.format(context)}"),
+                    ],
+                  ),
+                ),
                 TextButton(
                   onPressed: () => _pickScheduleDate(context),
-                  child: Text("日付を選択"),
+                  child: Text("日付"),
                 ),
-                Spacer(),
+                TextButton(
+                  onPressed: () => _pickScheduleTime(context),
+                  child: Text("時刻"),
+                ),
                 ElevatedButton(onPressed: _addSchedule, child: Text("予定を追加")),
               ],
             ),
             // 追加されたスケジュールの一覧表示
             ...schedules.map((s) => ListTile(
               title: Text(s['title']),
-              subtitle: Text(s['date'].split('T')[0]),
+              subtitle: Text(s['date'].replaceFirst('T', ' ').substring(0, 16)),
               trailing: IconButton(
                 icon: Icon(Icons.delete),
                 onPressed: () {

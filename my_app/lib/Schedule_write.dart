@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import 'notification_service.dart';
 
 class ScheduleWritePage extends StatefulWidget {
+  const ScheduleWritePage({super.key});
+
   @override
-  _ScheduleWritePageState createState() => _ScheduleWritePageState();
+  State<ScheduleWritePage> createState() => _ScheduleWritePageState();
 }
 
 class _ScheduleWritePageState extends State<ScheduleWritePage> {
@@ -51,15 +56,15 @@ class _ScheduleWritePageState extends State<ScheduleWritePage> {
             Row(
               children: [
                 Text("日付: ${selectedDate.year}-${selectedDate.month}-${selectedDate.day}"),
-                Spacer(),
-                TextButton(child: Text("選択"), onPressed: _selectDate),
+                const Spacer(),
+                TextButton(onPressed: _selectDate, child: const Text("選択")),
               ],
             ),
             Row(
               children: [
                 Text("時間: ${selectedTime.format(context)}"),
-                Spacer(),
-                TextButton(child: Text("選択"), onPressed: _selectTime),
+                const Spacer(),
+                TextButton(onPressed: _selectTime, child: const Text("選択")),
               ],
             ),
             Row(
@@ -72,14 +77,44 @@ class _ScheduleWritePageState extends State<ScheduleWritePage> {
             SizedBox(height: 16),
             ElevatedButton(
               child: Text("保存"),
-              onPressed: () {
-                Navigator.pop(context, {
+              onPressed: () async {
+                final scheduleData = {
                   "title": titleController.text,
                   "content": contentController.text,
                   "date": selectedDate.toIso8601String(),
-                  "time": selectedTime.format(context),
+                  "time": "${selectedTime.hour}:${selectedTime.minute}",
                   "notify": notify,
-                });
+                };
+
+                if (notify) {
+                  // 日付と時間を組み合わせて DateTime オブジェクトを作成
+                  final scheduledDateTime = DateTime(
+                    selectedDate.year,
+                    selectedDate.month,
+                    selectedDate.day,
+                    selectedTime.hour,
+                    selectedTime.minute,
+                  );
+                  
+                  await NotificationService().scheduleNotification(
+                    id: DateTime.now().millisecondsSinceEpoch ~/ 1000, // 簡易的なID生成
+                    title: titleController.text,
+                    body: contentController.text,
+                    scheduledDate: scheduledDateTime,
+                  );
+                }
+
+                // --- ここでデータを保存する ---
+                final prefs = await SharedPreferences.getInstance();
+                // 既存のリストを取得
+                List<String> schedules = prefs.getStringList('schedules') ?? [];
+                // 新しいデータを追加（JSON文字列に変換）
+                schedules.add(jsonEncode(scheduleData));
+                // 保存
+                await prefs.setStringList('schedules', schedules);
+
+                if (!mounted) return;
+                Navigator.pop(context, scheduleData);
               },
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'notification_service.dart';
 
 import 'homepage.dart';
 import 'Firstpage.dart';
@@ -9,8 +10,10 @@ import 'Memopage.dart';
 import 'Taskpage.dart';
 
 
-
-void main() {
+void main() async {
+  // 非同期処理（通知の初期化など）を行うために必要
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().init();
   runApp(const MyApp());
 }
 
