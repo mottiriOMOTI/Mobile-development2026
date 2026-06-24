@@ -7,6 +7,9 @@ import 'MemoWritePageEditing.dart'; // 修正済みの動的フォーム対応�
 import 'MemoCustomizePage.dart'; // 修正済みの安全版
 import 'memo_comparison_page.dart';
 
+// 1. 【エラー修正】AIチャットボタンが定義されているファイルをインポート
+import 'ai_chat_support.dart'; 
+
 class Memopage extends StatefulWidget {
   const Memopage({super.key}); // 【警告修正】constとsuper.keyを追加
 
@@ -20,7 +23,7 @@ class _MemopageState extends State<Memopage> {
   
   // 端末保存データがない場合のデフォルト初期値
   List<CustomField> customFields = [
-    CustomField(name: "転勤の有無", type: FieldType.radio, options: ["有", "無"]),
+    CustomField(name: "転勤の有無", type: FieldType.radio, options: ["暗", "無"]),
     CustomField(name: "時給", type: FieldType.number),
     CustomField(name: "兼業の可否", type: FieldType.radio, options: ["可", "否"]),
     CustomField(name: "志望度", type: FieldType.radio, options: ["◎","〇","△","×","？"]),
@@ -161,23 +164,38 @@ class _MemopageState extends State<Memopage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => MemoWritePage(customFields: customFields),
-            ),
-          );
-          if (result != null && result is String) {
-            setState(() {
-              memos.add(Memo.fromJson(jsonDecode(result)));
-              sortMemos(); // 追加後すぐにソート
-              saveMemos();
-            });
-          }
-        },
+      
+      // 2. 【エラー修正】Columnを使って、AI相談ボタンと追加ボタンを縦に並べる
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          // 上段：AI相談ボタン（widget.memos ではなく、このクラス内にある memos を直接渡す）
+          buildAiChatButton(context, memos), 
+          
+          const SizedBox(height: 12), // ボタン同士の隙間
+          
+          // 下段：通常のメモ追加ボタン
+          FloatingActionButton(
+            heroTag: "add_memo_fab", // 【エラー予防】複数ボタンの衝突を防ぐタグ
+            child: const Icon(Icons.add),
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => MemoWritePage(customFields: customFields),
+                ),
+              );
+              if (result != null && result is String) {
+                setState(() {
+                  memos.add(Memo.fromJson(jsonDecode(result)));
+                  sortMemos(); // 追加後すぐにソート
+                  saveMemos();
+                });
+              }
+            },
+          ),
+        ],
       ),
     );
   }
