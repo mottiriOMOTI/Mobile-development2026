@@ -76,7 +76,7 @@ class _MemopageState extends State<Memopage> {
     switch (status) {
       case "未対応": return const Color.fromARGB(255, 3, 116, 82);
       case "面談": return const Color.fromARGB(255, 21, 109, 180);
-      case "１次～選考": return const Color.fromARGB(255, 161, 100, 8);
+      case "n次選考": return const Color.fromARGB(255, 161, 100, 8);
       case "選考インターン": return const Color.fromARGB(255, 130, 67, 141);
       case "最終選考": return const Color.fromARGB(255, 150, 0, 102);
       case "内定": return const Color.fromARGB(255, 0, 122, 4);
