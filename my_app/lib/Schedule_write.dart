@@ -24,35 +24,43 @@ class _ScheduleWritePageState extends State<ScheduleWritePage> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
-    if (picked != null) setState(() => selectedDate = picked);
+    if (picked != null) {
+      setState(() => selectedDate = picked);
+    }
   }
 
   Future<void> _selectTime() async {
     final TimeOfDay? picked =
         await showTimePicker(context: context, initialTime: selectedTime);
-    if (picked != null) setState(() => selectedTime = picked);
+    if (picked != null) {
+      setState(() => selectedTime = picked);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("予定を書く")),
+      appBar: AppBar(title: const Text("予定を書く")),
       body: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               controller: titleController,
-              decoration:
-                  InputDecoration(labelText: "タイトル", border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: "タイトル",
+                border: OutlineInputBorder(),
+              ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             TextField(
               controller: contentController,
-              decoration:
-                  InputDecoration(labelText: "内容", border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: "内容",
+                border: OutlineInputBorder(),
+              ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               children: [
                 Text("日付: ${selectedDate.year}-${selectedDate.month}-${selectedDate.day}"),
@@ -69,14 +77,14 @@ class _ScheduleWritePageState extends State<ScheduleWritePage> {
             ),
             Row(
               children: [
-                Text("通知"),
-                Spacer(),
+                const Text("通知"),
+                const Spacer(),
                 Switch(value: notify, onChanged: (val) => setState(() => notify = val)),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ElevatedButton(
-              child: Text("保存"),
+              child: const Text("保存"),
               onPressed: () async {
                 final scheduleData = {
                   "title": titleController.text,
