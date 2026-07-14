@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'Memo_model.dart';
+import 'Taskpage.dart';
 import 'Memo_write.dart'; // 修正済みの動的フォーム対応版
 import 'MemoWritePageEditing.dart'; // 修正済みの動的フォーム対応版
 import 'MemoCustomizePage.dart'; // 修正済みの安全版
@@ -136,7 +137,9 @@ class _MemopageState extends State<Memopage> {
                     ),
                   );
                 },
+                
               ),
+
 
               TextButton(
                 child: const Text("ホームへ戻る"),

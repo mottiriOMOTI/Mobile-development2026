@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 import 'notification_service.dart';
 
 import 'homepage.dart';
-import 'Firstpage.dart';
-import 'Seconpage.dart';
-import 'Trirtpage.dart';
 
 import 'Memopage.dart';
 import 'Taskpage.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart'; // ← ファイルの上部にインポートがあるか確認してください
 
 void main() async {
   // 非同期処理（通知の初期化など）を行うために必要
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // ▼ ここに dotenv の読み込みを追加 ▼
+  await dotenv.load(fileName: ".env");
+
+  // 既存の通知サービスの初期化
   await NotificationService().init();
+  
   runApp(const MyApp());
 }
 
@@ -55,9 +59,6 @@ class MyApp extends StatelessWidget {
     // （2） ページ名とウィジェットの関係
       routes: {
         '/home' : (context) => HomePage(),
-        '/first' : (context) => FirstPage(),
-        '/second' : (context) => SecondPage(),
-        '/Thirt' : (context) => Thirtpage(),
 
         '/Memo' : (context) => Memopage(),
         '/Task' : (context) => Taskpage(),

@@ -32,6 +32,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  google_generative_ai: ^0.4.0
+  flutter_dotenv: ^5.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -64,6 +66,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  # 以下の2行を追加して .env を読み込めるようにします
+  assets:
+    - assets/.env
 
   # To add assets to your application, add an assets section, like this:
   # assets:
